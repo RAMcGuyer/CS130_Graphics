@@ -3,6 +3,7 @@
 #include "object.h"
 #include "light.h"
 #include "ray.h"
+#include <limits>
 
 extern bool disable_hierarchy;
 
@@ -22,15 +23,26 @@ Render_World::~Render_World()
 // to ensure that hit.dist>=small_t.
 Hit Render_World::Closest_Intersection(const Ray& ray)
 {
-    TODO;
-    return {};
+    int min_t = std::numeric_limits<int>::max();
+    Object::Hit hit;
+    Object::Hit closest_hit = 0;
+    for(Object* o: Render_World::objects){
+        hit = o->Object::Intersect(ray, 1);
+        if(hit.dist < min_t && hit.dist > Object::small_t){
+            min_t = hit.dist;
+	    closest_hit = hit; 
+        }
+    } 
+    return hit;
 }
 
 // set up the initial view ray and call
 void Render_World::Render_Pixel(const ivec2& pixel_index)
 {
-    TODO; // set up the initial view ray here
-    Ray ray;
+     // set up the initial view ray here
+    vec3 end_point = camera.position; // Start point of our ray
+    vec3 dir = camera.World_position(pixel_index) - end_point; //direction vector, I - E
+    Ray ray(end_point, dir); // ray constructor already normalizes direction
     vec3 color=Cast_Ray(ray,1);
     camera.Set_Pixel(pixel_index,Pixel_Color(color));
 }
@@ -50,7 +62,15 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 {
     vec3 color;
-    TODO; // determine the color here
+    Object::Hit closest_hit = Render_World::Closest_Intersection(ray);
+    if(closest_hit.object != 0){ // If hit.object is not null, there is an intersection.
+        vec3 ip = ray.Point(hit.dist); //intersection point of ray and object
+	vec3 norm = cross(ray.direction, hit)//the vector normal to the surface of the object
+        color = closest_hit->object.Shade_Surface() 
+    }
+    else{
+    
+    }    
     return color;
 }
 
