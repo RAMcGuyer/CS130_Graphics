@@ -4,14 +4,38 @@
 // Determine if the ray intersects with the sphere
 Hit Sphere::Intersection(const Ray& ray, int part) const
 {
-    TODO;
-    return {0,0,0};
+    //s(x) = (x - c) * (x -c) = r^2
+    // r(t) = e + Ut
+    Hit hit;
+    vec3 W = ray.endpoint - center;
+    double a, b, c, t1, t2, root;
+    a = dot(ray.direction, ray.direction);
+    b = dot(ray.direction, W);
+    c = dot(W, W) - (radius*radius);
+    root = (b*b) - 4*a*c;
+    if(root < 0){
+        hit = {0, 0, 0};
+    }
+    else{
+        t1 = ((-1)*b + sqrt(root))/(2*a);
+        t2 = ((-1)*b - sqrt(root))/(2*a);
+        if(t1 < t2 && t1 > small_t){ //t1 is closer to camera
+            hit = {this, t1, 1};
+        }
+        else if(t2 > small_t){ //t2 is closer to camera
+            hit = {this, t2, 1};
+        }
+        else{ //no intersect
+            hit = {0, 0, 0};
+        }
+    }    
+    return hit;
 }
 
 vec3 Sphere::Normal(const vec3& point, int part) const
 {
-    vec3 normal;
-    TODO; // compute the normal direction
+    vec3 normal = point - center; // compute a vector that is normal to the sphere.
+    normal.normalized(); // Creates a unit vector of the normal.
     return normal;
 }
 

@@ -24,16 +24,16 @@ Render_World::~Render_World()
 Hit Render_World::Closest_Intersection(const Ray& ray)
 {
     int min_t = std::numeric_limits<int>::max();
-    Object::Hit hit;
-    Object::Hit closest_hit = 0;
+    Hit hit;
+    Hit closest_hit = {0, 0 ,0};
     for(Object* o: Render_World::objects){
-        hit = o->Object::Intersect(ray, 1);
-        if(hit.dist < min_t && hit.dist > Object::small_t){
+        hit = o->Intersection(ray, 1);
+        if(hit.dist < min_t && hit.dist > small_t){
             min_t = hit.dist;
 	    closest_hit = hit; 
         }
     } 
-    return hit;
+    return closest_hit;
 }
 
 // set up the initial view ray and call
@@ -41,7 +41,7 @@ void Render_World::Render_Pixel(const ivec2& pixel_index)
 {
      // set up the initial view ray here
     vec3 end_point = camera.position; // Start point of our ray
-    vec3 dir = camera.World_position(pixel_index) - end_point; //direction vector, I - E
+    vec3 dir = camera.World_Position(pixel_index) - end_point; //direction vector, I - E
     Ray ray(end_point, dir); // ray constructor already normalizes direction
     vec3 color=Cast_Ray(ray,1);
     camera.Set_Pixel(pixel_index,Pixel_Color(color));
@@ -62,14 +62,15 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 {
     vec3 color;
-    Object::Hit closest_hit = Render_World::Closest_Intersection(ray);
+    Hit closest_hit = Render_World::Closest_Intersection(ray);
     if(closest_hit.object != 0){ // If hit.object is not null, there is an intersection.
-        vec3 ip = ray.Point(hit.dist); //intersection point of ray and object
-	vec3 norm = cross(ray.direction, hit)//the vector normal to the surface of the object
-        color = closest_hit->object.Shade_Surface() 
+        vec3 ip = ray.Point(closest_hit.dist); //intersection point of ray and object
+	vec3 norm = closest_hit.object->Normal(ip, 1); //the vector normal to the surface of the object
+        color = closest_hit.object->material_shader->Shade_Surface(ray, ip, norm, recursion_depth); 
     }
     else{
-    
+        //back_ground shader is a flat shader, any vectors will do for arguments.
+        color = background_shader->Shade_Surface(ray, ray.direction, ray.direction, recursion_depth);
     }    
     return color;
 }
