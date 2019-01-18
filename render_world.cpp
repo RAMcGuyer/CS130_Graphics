@@ -28,7 +28,7 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
     Hit closest_hit = {0, 0 ,0};
     for(Object* o: Render_World::objects){
         hit = o->Intersection(ray, 1);
-        if(hit.dist < min_t && hit.dist > small_t){
+        if(hit.object && hit.dist < min_t && hit.dist > small_t){
             min_t = hit.dist;
 	    closest_hit = hit; 
         }
@@ -62,7 +62,7 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 {
     vec3 color;
-    Hit closest_hit = Render_World::Closest_Intersection(ray);
+    Hit closest_hit = Closest_Intersection(ray);
     if(closest_hit.object != 0){ // If hit.object is not null, there is an intersection.
         vec3 ip = ray.Point(closest_hit.dist); //intersection point of ray and object
 	vec3 norm = closest_hit.object->Normal(ip, 1); //the vector normal to the surface of the object
