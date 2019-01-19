@@ -17,7 +17,7 @@ Hit Plane::Intersection(const Ray& ray, int part) const
         hit = {0, 0, 0}; //no intersection
     }
     else{
-        t = dot(W, normal)/U;
+        t = (-1)*dot(W, normal)/U;
         if(t > small_t){
             hit = {this, t, 1};
         }

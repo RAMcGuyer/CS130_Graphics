@@ -9,20 +9,20 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
     Hit hit;
     vec3 W = ray.endpoint - center;
     double a, b, c, t1, t2, root;
-    a = dot(ray.direction, ray.direction);
+    a = ray.direction.magnitude_squared();
     b = 2*dot(ray.direction, W);
-    c = dot(W, W) - (radius*radius);
-    root = (b*b) - 4*a*c;
+    c = W.magnitude_squared() - (radius*radius);
+    root = (b*b) - (4*a*c);
     if(root < 0){
         hit = {0, 0, 0};
     }
     else{
         t1 = ((-1)*b + sqrt(root))/(2*a);
         t2 = ((-1)*b - sqrt(root))/(2*a);
-        if(t1 < t2 && t1 > small_t){ //t1 is closer to camera
+        if(t1 < t2 && t1 >= small_t){ //t1 is closer to camera
             hit = {this, t1, 1};
         }
-        else if(t2 > small_t){ //t2 is closer to camera
+        else if(t2 <= t1 && t2 >= small_t){ //t2 is closer to camera
             hit = {this, t2, 1};
         }
         else{ //no intersect

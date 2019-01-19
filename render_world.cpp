@@ -23,12 +23,12 @@ Render_World::~Render_World()
 // to ensure that hit.dist>=small_t.
 Hit Render_World::Closest_Intersection(const Ray& ray)
 {
-    int min_t = std::numeric_limits<int>::max();
+    double min_t = std::numeric_limits<double>::max();
     Hit hit;
     Hit closest_hit = {0, 0 ,0};
-    for(Object* o: Render_World::objects){
+    for(Object* o: objects){
         hit = o->Intersection(ray, 1);
-        if(hit.object && hit.dist < min_t && hit.dist > small_t){
+        if(hit.object && hit.dist < min_t && hit.dist >= small_t){
             min_t = hit.dist;
 	    closest_hit = hit; 
         }
