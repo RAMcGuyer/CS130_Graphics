@@ -35,7 +35,7 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 vec3 Sphere::Normal(const vec3& point, int part) const
 {
     vec3 normal = point - center; // compute a vector that is normal to the sphere.
-    normal.normalized(); // Creates a unit vector of the normal.
+    normal = normal.normalized(); // Creates a unit vector of the normal.
     return normal;
 }
 
